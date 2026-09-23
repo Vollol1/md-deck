@@ -72,8 +72,20 @@
       const themeParam = params.get('theme');
 
       // ── Theme loading ──────────────────────────────────────────
+      let themeLoadPromise = Promise.resolve();
       if (themeParam) {
         const link = document.getElementById('theme-override');
+        // The stylesheet loads asynchronously. Branding is read from the
+        // theme's CSS custom properties, so we must wait for the load event
+        // instead of relying on a fixed number of animation frames —
+        // otherwise --slide-logo is still empty and no logo is rendered.
+        themeLoadPromise = new Promise(resolve => {
+          link.addEventListener('load', resolve, { once: true });
+          link.addEventListener('error', resolve, { once: true });
+          // Safety net in case the stylesheet is already cached and neither
+          // event fires after src assignment.
+          setTimeout(resolve, 2000);
+        });
         link.href = `themes/${themeParam}.css`;
         link.disabled = false;
       }
@@ -136,8 +148,12 @@
         window.__slideTitleDefault = titleDefault;
       }
 
-      // Wait for theme CSS to be applied before reading custom properties
-      requestAnimationFrame(() => requestAnimationFrame(applyBranding));
+      // Wait for theme CSS to be applied before reading custom properties.
+      // applyBranding() reads --slide-logo / --slide-footer etc. from the
+      // theme stylesheet, so it must not run before that sheet has loaded.
+      themeLoadPromise.then(() =>
+        requestAnimationFrame(() => requestAnimationFrame(applyBranding))
+      );
 
       // ── Deck picker or presentation ─────────────────────────────
       if (!mdParam) {
