@@ -29,6 +29,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Theme serving accepts assets (images, fonts), not just CSS
 - `THEME` documented without the `.css` extension
 
+### Fixed
+- Branding (`--slide-logo`, `--slide-footer`, title suffix) was never applied when
+  a theme was selected: `applyBranding()` ran two animation frames after the
+  `?theme=` stylesheet was enabled, but stylesheets load asynchronously, so the
+  custom properties were still empty. It now waits for the stylesheet's `load`
+  event. Symptom was a missing logo in both the live presentation and the PDF.
+- `/favicon.ico` returned 404 even when the file existed, because Vite has no
+  mapping for the `.ico` extension. The middleware now serves it explicitly.
+
+### Known issues
+- decktape logs one `404 (Not Found)` per PDF export. This comes from decktape's
+  own browser requesting `/decktape/favicon.ico`; the dev server answers that path
+  with the SPA fallback (`index.html`), which is not an image. It is cosmetic —
+  it does not affect the rendered PDF, which contains all slides, the theme asset
+  and the bookmarks.
+
 ## [0.1.0] - 12.05.2026
 
 ### Added
