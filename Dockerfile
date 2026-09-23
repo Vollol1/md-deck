@@ -37,7 +37,6 @@ RUN npm install && npm install --save-dev decktape && npm cache clean --force
 
 # ── Copy engine files ────────────────────────────────────────────────────────
 COPY index.html vite.config.js ./
-COPY favicon.ico favicon.png ./
 COPY themes/ ./themes/
 COPY scripts/ ./scripts/
 COPY slides/ ./slides/
