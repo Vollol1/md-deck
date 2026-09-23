@@ -60,6 +60,17 @@ export default defineConfig({
         }
 
         if (!url?.startsWith('/slides/')) {
+          // Vite does not serve .ico from the project root, so /favicon.ico
+          // would 404 even though the file exists. Serve it explicitly.
+          if (url === '/favicon.ico') {
+            const ico = resolve(__dirname, 'favicon.ico');
+            if (existsSync(ico)) {
+              res.setHeader('Content-Type', 'image/x-icon');
+              createReadStream(ico).pipe(res);
+              return;
+            }
+          }
+
           // Serve theme files (CSS, logos) from the external theme directory
           // first, falling back to the engine's own themes/ directory.
           //
