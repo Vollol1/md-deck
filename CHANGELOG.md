@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Favicon (`favicon.ico`, `favicon.png`) and `<link rel="icon">` tags, so the
+  browser no longer requests a missing `/favicon.ico` (a 404 that showed up in
+  the PDF export log)
 - `THEME_DIR` — serve themes from an external directory (takes precedence over
   the engine's own `themes/`), enabling wrapper repos that ship their own brand
   without patching the engine
