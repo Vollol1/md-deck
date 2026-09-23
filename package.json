@@ -1,6 +1,6 @@
 {
   "name": "md-deck",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Write and version Reveal.js presentations in Markdown, export them as PDF",
   "license": "MIT",
   "author": "Knab Florian",

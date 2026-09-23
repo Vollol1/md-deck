@@ -355,3 +355,4 @@ git commit
 
 - **decktape and themes** — decktape renders the page as-is. If your override theme sets branding elements (logo, sidebar), make sure to include the `?theme=` parameter in the export URL.
 - **First PDF export is slow** — decktape downloads Chromium on first run (~100 MB). Subsequent exports are fast.
+- **decktape logs one `404 (Not Found)` per export** — it comes from decktape's own browser requesting `/decktape/favicon.ico`; the dev server answers that path with the SPA fallback (`index.html`), which is not an image. Cosmetic: the exported PDF is complete and contains all slides, theme assets and bookmarks.
