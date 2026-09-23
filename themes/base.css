@@ -1,0 +1,218 @@
+/*
+ * Base Theme for reveal.js
+ * Loaded on top of dist/theme/white.css.
+ *
+ * Uses CSS custom properties (design tokens) so that
+ * override themes only need to redefine variables.
+ *
+ * Override: create a theme CSS file that @import's this file
+ * and redefines the custom properties.
+ */
+
+/* ── Design Tokens ──────────────────────────────────────── */
+:root {
+  /* Colors */
+  --slide-primary:      #2d2d2d;   /* headings, primary elements */
+  --slide-accent:       #555;      /* bullets, borders, code accents */
+  --slide-accent-bg:    #f0f0f0;   /* subtle backgrounds, alternating rows */
+  --slide-bg:           #fafafa;   /* viewport background */
+  --slide-text:         #333;      /* body text */
+  --slide-muted:        #888;      /* secondary text, footer, slide number */
+  --slide-link:         #2a6ebb;   /* link color */
+  --slide-link-hover:   #1a4e8a;   /* link hover */
+
+  /* Fonts */
+  --slide-font:         system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --slide-font-heading: var(--slide-font);
+  --slide-font-mono:    ui-monospace, 'Cascadia Code', 'Fira Code', Menlo, monospace;
+
+  /* Branding slots (override themes can set these) */
+  --slide-logo:         none;
+  --slide-sidebar:      none;
+  --slide-footer:       '';
+  --slide-title-suffix: '';
+  --slide-title-default: 'Presentation';
+
+  /* Layout */
+  --slide-padding-left:  20px;
+  --slide-padding-right: 20px;
+}
+
+/* ── Viewport & Basis ───────────────────────────────────── */
+.reveal-viewport {
+  background: var(--slide-bg);
+}
+.reveal {
+  font-family: var(--slide-font);
+  color: var(--slide-text);
+}
+.reveal .slides {
+  padding-left: var(--slide-padding-left) !important;
+  padding-right: var(--slide-padding-right) !important;
+  margin-top: 0 !important;
+}
+.reveal .slides > section {
+  min-height: auto !important;
+}
+
+/* ── Headings ───────────────────────────────────────────── */
+.reveal h1,
+.reveal h2,
+.reveal h3,
+.reveal h4 {
+  font-family: var(--slide-font-heading);
+  color: var(--slide-primary);
+  text-transform: none;
+  text-shadow: none;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.35em;
+}
+.reveal h1 { font-size: 1.5em;  font-weight: 800; }
+.reveal h2 { font-size: 1.1em;  font-weight: 700; }
+.reveal h3 { font-size: 0.9em;  font-weight: 600; color: var(--slide-accent); }
+.reveal h4 { font-size: 0.8em;  font-weight: 600; }
+
+/* ── Links ──────────────────────────────────────────────── */
+.reveal a       { color: var(--slide-link); text-decoration: none; }
+.reveal a:hover { color: var(--slide-link-hover); text-decoration: underline; }
+
+/* ── Slides left-aligned ────────────────────────────────── */
+.reveal .slides section {
+  text-align: left;
+}
+
+/* ── Lists ──────────────────────────────────────────────── */
+.reveal ul > li::marker,
+.reveal ol > li::marker {
+  color: var(--slide-accent);
+  font-weight: 700;
+}
+
+/* ── Code ───────────────────────────────────────────────── */
+.reveal pre {
+  box-shadow: none;
+  border-left: 4px solid var(--slide-accent);
+  border-radius: 0 4px 4px 0;
+}
+.reveal pre code {
+  font-size: 0.65em;
+  line-height: 1.5em;
+}
+.reveal :not(pre) > code {
+  color: var(--slide-primary);
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+
+/* ── Tables ────────────────────────────────────────────── */
+.reveal table {
+  font-size: 0.72em;
+  border-collapse: collapse;
+  width: 100%;
+}
+.reveal table thead tr {
+  background: var(--slide-accent);
+}
+.reveal table th {
+  color: white;
+  font-weight: 700;
+  padding: 0.45em 0.8em;
+  border: none;
+}
+.reveal table td {
+  padding: 0.38em 0.8em;
+  border: none;
+  border-bottom: 1px solid var(--slide-accent-bg);
+}
+.reveal table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--slide-accent-bg) 30%, transparent);
+}
+
+/* ── Blockquote ────────────────────────────────────────── */
+.reveal blockquote {
+  border-left: 4px solid var(--slide-accent);
+  background: rgba(0, 0, 0, 0.03);
+  color: var(--slide-muted);
+  padding: 0.4em 1em;
+  border-radius: 0 4px 4px 0;
+  box-shadow: none;
+  width: auto;
+  font-style: italic;
+}
+
+/* ── Progress bar ──────────────────────────────────────── */
+.reveal .progress span {
+  background: var(--slide-accent);
+}
+
+/* ── Slide number ───────────────────────────────────────── */
+.reveal .slide-number {
+  background: transparent;
+  color: var(--slide-muted);
+  font-size: 0.42em;
+  font-family: var(--slide-font);
+  bottom: 22px;
+  left: 20px;
+}
+
+/* ── Navigation controls ────────────────────────────────── */
+.reveal .controls,
+.reveal-viewport .controls,
+.controls {
+  color: var(--slide-primary);
+  z-index: 100 !important;
+  position: fixed !important;
+}
+.reveal .controls button,
+.reveal-viewport .controls button {
+  color: var(--slide-primary);
+  opacity: 0.7;
+}
+.reveal .controls button:hover,
+.reveal-viewport .controls button:hover {
+  opacity: 1;
+}
+
+/* ── Branding: Logo (top-right) ─────────────────────────── */
+.reveal .brand-logo {
+  position: fixed;
+  top: 10px;
+  right: 14px;
+  z-index: 20;
+  pointer-events: none;
+  display: none;  /* shown only when --slide-logo is set */
+}
+
+/* ── Branding: Sidebar (left) ───────────────────────────── */
+.reveal .brand-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100px;
+  height: 100%;
+  overflow: hidden;
+  z-index: 5;
+  pointer-events: none;
+  display: none;  /* shown only when --slide-sidebar is set */
+}
+
+/* ── Branding: Footer (bottom) ──────────────────────────── */
+.reveal .brand-footer {
+  position: fixed;
+  bottom: 9px;
+  left: var(--slide-padding-left);
+  right: 80px;
+  z-index: 20;
+  pointer-events: none;
+  font-family: var(--slide-font);
+  font-size: 10px;
+  color: var(--slide-muted);
+  text-align: center;
+  display: none;  /* hidden by default, shown via JS when footer text is set */
+}
+
+/* ── Fragment highlight colors ─────────────────────────── */
+/* reveal.js provides highlight-red, highlight-green, highlight-blue out of the box */
+/* These change color when the fragment becomes visible */

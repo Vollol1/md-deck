@@ -1,0 +1,7 @@
+.git
+.vite
+node_modules
+slides/*.pdf
+*.pdf
+*.log
+.env*

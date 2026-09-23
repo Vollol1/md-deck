@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <title>Presentation</title>
+
+    <!-- dist/ is a symlink to node_modules/reveal.js/dist/ (created by npm install) -->
+    <link rel="stylesheet" href="dist/reset.css" />
+    <link rel="stylesheet" href="dist/reveal.css" />
+    <link rel="stylesheet" href="dist/theme/white.css" />
+    <!-- Base theme — always loaded -->
+    <link rel="stylesheet" href="themes/base.css" id="theme-base" />
+    <!-- Override theme — loaded when ?theme=<name> is set -->
+    <link rel="stylesheet" href="" id="theme-override" disabled />
+    <!-- Code highlighting -->
+    <link rel="stylesheet" href="dist/plugin/highlight/monokai.css" />
+  </head>
+  <body>
+
+    <!-- Branding containers — populated by JS when a theme sets CSS variables -->
+
+    <!-- Logo top-right (shown when --slide-logo is set) -->
+    <div class="brand-logo" aria-hidden="true" style="position:fixed; top:10px; right:14px; z-index:20;">
+      <img id="brand-logo-img" alt="" style="height: 44px;" />
+    </div>
+
+    <!-- Left sidebar image (shown when --slide-sidebar is set) -->
+    <div class="brand-sidebar" aria-hidden="true">
+      <img id="brand-sidebar-img" alt=""
+           style="width:auto; height:100%; object-fit:cover; object-position:center center;" />
+    </div>
+
+    <!-- Footer (populated from --slide-footer) -->
+    <div class="brand-footer" aria-hidden="true" style="position:fixed; bottom:9px; left:20px; right:80px; z-index:20; font-family:system-ui,sans-serif; font-size:10px; color:#888; text-align:center;">
+      <span id="brand-footer-text"></span>
+    </div>
+
+    <!-- Deck picker (shown when no ?md= parameter is set) -->
+    <div id="deck-picker" style="display:none; position:fixed; inset:0; z-index:50;
+         background:#fff; font-family:system-ui,sans-serif;
+         padding:80px 140px; box-sizing:border-box; overflow-y:auto;">
+      <h2 style="font-size:1.4rem; color:#1c2b33; margin:0 0 6px;">Select a deck</h2>
+      <p style="color:#6b7c85; font-size:0.9rem; margin:0 0 28px;">
+        Available presentations in <code>slides/</code>
+      </p>
+      <ul id="deck-list" style="list-style:none; margin:0; padding:0;"></ul>
+    </div>
+
+    <div class="reveal">
+      <div class="slides">
+        <section
+          data-separator="^---"
+          data-separator-vertical="^--"
+          data-separator-notes="^Note:"
+          data-charset="utf-8"
+          data-markdown
+        ></section>
+      </div>
+    </div>
+    <script type="module">
+      import Reveal    from 'reveal.js';
+      import Markdown  from 'reveal.js/plugin/markdown/markdown.esm.js';
+      import Highlight from 'reveal.js/plugin/highlight/highlight.esm.js';
+      import Notes     from 'reveal.js/plugin/notes/notes.esm.js';
+
+      const params = new URLSearchParams(location.search);
+      const mdParam    = params.get('md');
+      const themeParam = params.get('theme');
+
+      // ── Theme loading ──────────────────────────────────────────
+      if (themeParam) {
+        const link = document.getElementById('theme-override');
+        link.href = `themes/${themeParam}.css`;
+        link.disabled = false;
+      }
+
+      // ── Apply branding from CSS variables (after theme CSS loads) ──
+      function applyBranding() {
+        const style = getComputedStyle(document.documentElement);
+        const logoRaw       = style.getPropertyValue('--slide-logo').trim();
+        const sidebarRaw    = style.getPropertyValue('--slide-sidebar').trim();
+        const footerRaw     = style.getPropertyValue('--slide-footer').trim();
+        const titleSuffixRaw = style.getPropertyValue('--slide-title-suffix').trim();
+        const titleDefaultRaw = style.getPropertyValue('--slide-title-default').trim();
+
+        // CSS url(...) values are relative to the theme CSS file.
+        // Strip the url(...) wrapper and resolve against themes/<theme>.css.
+        const themeCssUrl = themeParam ? `themes/${themeParam}.css` : '';
+        function resolveUrl(value) {
+          const match = value.match(/^url\(\s*['"]?\s*([^'")\n]+)\s*['"]?\s*\)$/);
+          const inner = match ? match[1].trim() : value.trim();
+          if (!inner || inner === 'none') return '';
+          if (!themeCssUrl) return inner;
+          return new URL(inner, new URL(themeCssUrl, location.href)).href;
+        }
+
+        // Strip surrounding quotes from CSS string values.
+        function unquote(value) {
+          return value.replace(/^['"]|['"]$/g, '').trim();
+        }
+
+        const logo       = resolveUrl(logoRaw);
+        const sidebar    = resolveUrl(sidebarRaw);
+        const footer     = unquote(footerRaw);
+        const titleSuffix = unquote(titleSuffixRaw);
+        const titleDefault = unquote(titleDefaultRaw);
+
+        // Logo
+        if (logo) {
+          const el = document.querySelector('.brand-logo');
+          el.style.display = 'block';
+          document.getElementById('brand-logo-img').src = logo;
+        }
+
+        // Sidebar
+        if (sidebar) {
+          const el = document.querySelector('.brand-sidebar');
+          el.style.display = 'block';
+          document.getElementById('brand-sidebar-img').src = sidebar;
+          // Adjust main content padding when sidebar is active
+          document.querySelector('.reveal').style.paddingLeft = '108px';
+        }
+
+        // Footer
+        if (footer && footer !== "''") {
+          document.getElementById('brand-footer-text').textContent = footer;
+          document.querySelector('.brand-footer').style.display = 'block';
+        }
+
+        // Title suffix (used when a deck is loaded)
+        window.__slideTitleSuffix = titleSuffix;
+        window.__slideTitleDefault = titleDefault;
+      }
+
+      // Wait for theme CSS to be applied before reading custom properties
+      requestAnimationFrame(() => requestAnimationFrame(applyBranding));
+
+      // ── Deck picker or presentation ─────────────────────────────
+      if (!mdParam) {
+        // No deck specified → show picker
+        document.getElementById('deck-picker').style.display = 'block';
+        document.title = window.__slideTitleDefault || 'Presentation';
+        fetch('/api/slides').then(r => r.json()).then(files => {
+          const list = document.getElementById('deck-list');
+          if (!files.length) {
+            list.innerHTML = `<li style="color:#888; font-size:0.9rem; line-height:1.8">
+              No .md files found in <code>slides/</code>.<br>
+              Create one with: <code>cp slides/template.md slides/my-deck.md</code>
+            </li>`;
+            return;
+          }
+          const themeQs = themeParam ? `&theme=${themeParam}` : '';
+          list.innerHTML = files.map(f =>
+            `<li style="margin-bottom:14px">
+              <a href="/?md=slides/${encodeURIComponent(f)}${themeQs}"
+                 style="font-size:1.05rem; color:#2a6ebb; text-decoration:none; font-weight:500">
+                ${f.replace(/\.md$/, '')}
+              </a>
+            </li>`
+          ).join('');
+        });
+      } else {
+        // Deck specified → start presentation
+        const section = document.querySelector('.slides section');
+        const deckName = mdParam.split('/').pop().replace(/\.md$/, '');
+        document.title = deckName + (window.__slideTitleSuffix || '');
+
+        // Verify the markdown file exists before Reveal tries to load it.
+        // If it is missing, show a helpful error instead of a blank slide.
+        fetch(mdParam, { method: 'HEAD' })
+          .then(response => {
+            const ct = response.headers.get('content-type') || '';
+            if (!response.ok || !ct.includes('markdown')) {
+              throw new Error(`Slide file not found: ${mdParam}`);
+            }
+
+            section.setAttribute('data-markdown', mdParam);
+
+            // window.Reveal is required so decktape (PDF export) can detect the plugin
+            window.Reveal = Reveal;
+
+            Reveal.initialize({
+              plugins: [Markdown, Highlight, Notes],
+              hash: true,
+              slideNumber: 'c/t',
+              transition: 'slide',
+              backgroundTransition: 'fade',
+              center: false,
+              margin: 0.1,
+              width: 1280,
+              height: 720,
+              markdown: {
+                gfm: true,
+                breaks: false,
+                escapeHtml: false
+              }
+            });
+          })
+          .catch(err => {
+            console.error(err);
+            const themeQs = themeParam ? `&theme=${themeParam}` : '';
+            section.innerHTML = `
+              <div style="padding:60px 40px; font-family:var(--slide-font, system-ui, sans-serif); color:var(--slide-text, #333);">
+                <h1 style="color:var(--slide-primary, #17406D); font-size:1.4em;">Deck not found</h1>
+                <p>Could not load <code style="background:rgba(0,0,0,0.05); padding:0.15em 0.4em; border-radius:3px;">${mdParam}</code>.</p>
+                <p style="margin-top:1.5em;">Available decks in <code>slides/</code>:</p>
+                <ul id="error-deck-list" style="margin-top:0.5em;"></ul>
+              </div>`;
+            fetch('/api/slides').then(r => r.json()).then(files => {
+              const list = document.getElementById('error-deck-list');
+              list.innerHTML = files.map(f =>
+                `<li style="margin:0.4em 0;">
+                   <a href="/?md=slides/${encodeURIComponent(f)}${themeQs}"
+                      style="color:var(--slide-link, #2a6ebb);">
+                     ${f.replace(/\.md$/, '')}
+                   </a>
+                 </li>`
+              ).join('') || '<li style="color:#888;">No .md files found in slides/</li>';
+            });
+          });
+      }
+    </script>
+  </body>
+</html>

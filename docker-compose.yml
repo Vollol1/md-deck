@@ -1,0 +1,53 @@
+# md-deck presentation engine
+#
+# Modes:
+#   Standalone: ./slides and ./themes are used by default
+#   Wrapper:    Creates ../deck.env with SLIDES_DIR=../slides and
+#               THEME_DIR=../themes (see setup.sh)
+#
+# The engine's own ./slides folder is always mounted as /decks/slides
+# (contains template.md and built-in decks).
+#
+# Themes from THEME_DIR take precedence over the engine's own themes/,
+# so a wrapper repo can ship its own branding without patching the engine.
+#
+# Quick start:
+#   ./setup.sh                 # first-time setup
+#   docker compose up preview  # start preview server
+#   DECK=my-deck.md docker compose run --rm export  # export to PDF
+
+x-base: &base
+  build:
+    context: .
+  env_file:
+    - path: .env
+      required: false
+    - path: ../deck.env
+      required: false
+  volumes:
+    - ${SLIDES_DIR:-./slides}:/slides:ro
+    - ./slides:/decks/slides:ro
+    - ${THEME_DIR:-./themes}:/themes:ro
+
+services:
+  preview:
+    <<: *base
+    command: preview
+    ports:
+      - "5173:5173"
+
+  export:
+    <<: *base
+    volumes:
+      - ${SLIDES_DIR:-./slides}:/slides
+      - ./slides:/decks/slides
+      - ${THEME_DIR:-./themes}:/themes:ro
+    command: export
+    # Export runs as root so decktape can write the PDF; entrypoint.sh chowns
+    # the result to the host user who owns /slides.
+    user: root
+    profiles: [export]
+    environment:
+      - DECK=${DECK:-template.md}
+      - THEME=${THEME:-}
+      - THEME_DIR=${THEME_DIR:-./themes}

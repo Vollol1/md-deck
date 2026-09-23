@@ -1,0 +1,51 @@
+/*
+ * Example Theme for reveal.js
+ * ──────────────────────────────────────────────────────────────────────────
+ * A template for building your own brand theme.
+ *
+ * Copy this file to <yourbrand>.css (in this directory or in your wrapper's
+ * themes/ directory), adjust the tokens below, and load it with:
+ *
+ *   http://localhost:5173/?md=slides/my-deck.md&theme=<yourbrand>
+ *
+ * Or for a PDF export:
+ *
+ *   THEME=<yourbrand> DECK=my-deck.md docker compose run --rm export
+ *
+ * Only the properties you set here override base.css — everything else
+ * keeps its default. See base.css for the full list of design tokens.
+ *
+ * Assets (logos, fonts) must sit in the SAME directory as this CSS file:
+ * index.html resolves url(...) values relative to the theme CSS file.
+ */
+
+@import 'base.css';
+
+/* ── Design Tokens ─────────────────────────────────────── */
+:root {
+  /* Colors — a deliberately neutral starting point */
+  --slide-primary:      #1f3a5f;   /* headings, primary elements */
+  --slide-accent:       #c97b2a;   /* bullets, borders, code accents */
+  --slide-accent-bg:    #f4f1ea;   /* subtle backgrounds, alternating rows */
+  --slide-bg:           #fbfaf7;   /* viewport background */
+  --slide-text:         #2b2b2b;   /* body text */
+  --slide-muted:        #7d7d7d;   /* secondary text, footer, slide number */
+  --slide-link:         #1f3a5f;   /* link color */
+  --slide-link-hover:   #142943;   /* link hover */
+
+  /* Fonts — swap in your brand typeface here */
+  --slide-font:         system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --slide-font-heading: var(--slide-font);
+  --slide-font-mono:    ui-monospace, 'Cascadia Code', 'Fira Code', Menlo, monospace;
+
+  /* Branding slots */
+  --slide-logo:         none;      /* e.g. url('mybrand-logo.png') */
+  --slide-sidebar:      none;      /* e.g. url('mybrand-sidebar.png') */
+  --slide-footer:       "Example Brand · example.com";
+  --slide-title-suffix: ' | Example';
+  --slide-title-default: 'Example Presentation';
+
+  /* Layout — increase left padding if you add a sidebar image */
+  --slide-padding-left:  20px;
+  --slide-padding-right: 20px;
+}

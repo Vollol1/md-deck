@@ -1,0 +1,25 @@
+node_modules/
+
+# Symlink created by postinstall
+dist
+
+# PDF exports (generated next to MD files)
+*.pdf
+
+# npm package-lock
+package-lock.json
+
+# Vite dev server cache
+.vite/
+
+# Plugin directory
+plugin
+
+# Local environment file (copy from .env.example)
+.env
+
+# Your own decks: only the template ships with the engine.
+# Keeps personal presentations out of this repository by accident.
+slides/*.md
+!slides/template.md
+slides/*.pdf

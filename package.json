@@ -1,0 +1,31 @@
+{
+  "name": "md-deck",
+  "version": "0.1.0",
+  "description": "Write and version Reveal.js presentations in Markdown, export them as PDF",
+  "license": "MIT",
+  "author": "Knab Florian",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vollol1/md-deck.git"
+  },
+  "keywords": [
+    "reveal.js",
+    "markdown",
+    "presentation",
+    "slides",
+    "pdf",
+    "decktape"
+  ],
+  "private": false,
+  "type": "module",
+  "scripts": {
+    "postinstall": "ln -sfn node_modules/reveal.js/dist dist",
+    "start": "vite",
+    "export:pdf": "DECK_NORM=\"${DECK#../}\"; DECK_NORM=\"${DECK_NORM%.md}\"; DECK_NORM=\"${DECK_NORM:-slides/template}\"; npx decktape reveal --size 1680x945 \"http://localhost:5173/?md=../$DECK_NORM.md\" \"../$DECK_NORM.pdf\" && node scripts/pdf-bookmarks.js \"../$DECK_NORM.md\" \"../$DECK_NORM.pdf\""
+  },
+  "devDependencies": {
+    "pdf-lib": "^1.17.1",
+    "reveal.js": "^5.1.0",
+    "vite": "^8.0.8"
+  }
+}
